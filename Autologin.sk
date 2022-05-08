@@ -1,0 +1,31 @@
+command /autol <text>:
+    trigger:
+        set {_pws} to arg 
+        set {_ip} to Ip of player
+        set {_uuid} to player's uuid
+        load yaml "plugins\Zhanan001\Autologin\login-%player%.yaml" as "login-%player%"
+        set yaml value "IP" from "login-%player%" to {_ip}        
+        set yaml value "password" from "login-%player%" to {_pws}
+        set yaml value "agree" from "login-%player%" to {true}
+        set yaml value "UUID" from "login-%player%" to {_uuid}
+        save yaml "login-%player%"
+on join:
+    load yaml "plugins\Zhanan001\Autologin\login-%player%.yaml" as "login-%player%"
+    set {_ipold} to yaml value "IP" from "login-%player%"
+    set {_ipnew} to Ip of player
+    set {_agree} to yaml value "agree" from "login-%player%"
+    set {_passw} to yaml value "password" from "login-%player%"
+    set {_uuid.1} to yaml value "UUID" from "login-%player%"
+    set {_uuid.2} to player's uuid
+    if {_agree} is true:
+        if {_ipnew} = {_ipold}:
+            if {_uuid.2} = {_uuid.1}:
+                command "login %{_passw}%" by player
+            else:
+                stop
+                send "检测到您uuid错误,为了确保你的账户安全，请手动输入密码,在重新配置"
+        else:
+            stop
+            send "为了确保你的账户安全，请手动输入密码"
+    else:
+        send "如果你想启用自动登录，请输入/autol <您的账号密码>来开启，开启即表示您已经同意了《上官明月隐私协议》"
